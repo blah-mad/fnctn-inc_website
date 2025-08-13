@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FNCTN — Building Agentec.io</title>
+    <meta name="description" content="We’re building Agentec.io — the fastest way to build, deploy, and orchestrate AI agents. Email contact@fnctn.io or call +1 (402) 797-1797.">
+    <meta property="og:title" content="FNCTN — Building Agentec.io">
+    <meta property="og:description" content="We’re building Agentec.io — the fastest way to build, deploy, and orchestrate AI agents. Ping us at contact@fnctn.io or +1 (402) 797-1797.">
+    <meta name="theme-color" content="#0b0e12">
+    <style>
+      :root {
+        --bg: #0b0e12;
+        --panel: #0f131a;
+        --border: #1b2230;
+        --text: #d9f8e6;
+        --muted: #7aa38e;
+        --accent: #46f3a3;
+        --accent-dim: #1f7c57;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        height: 100%;
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .wrap {
+        min-height: 100%;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .terminal {
+        width: min(780px, 100%);
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      }
+      .titlebar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 38px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--border);
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+      }
+      .dot { width: 12px; height: 12px; border-radius: 50%; }
+      .dot.red { background: #ff5f56; }
+      .dot.yellow { background: #ffbd2e; }
+      .dot.green { background: #27c93f; }
+      .title {
+        margin-left: 6px;
+        color: var(--muted);
+        font-size: 12px;
+        user-select: none;
+      }
+      .screen {
+        padding: 18px;
+      }
+      .line {
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      .prompt { color: var(--accent); }
+      .muted { color: var(--muted); }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 1.2em;
+        margin-left: 2px;
+        background: var(--accent);
+        vertical-align: -2px;
+        animation: blink 1s steps(1, end) infinite;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+      @media (prefers-reduced-motion: reduce) {
+        .cursor { animation: none; }
+      }
+      noscript .nojs {
+        display: block;
+      }
+      .nojs { display: none; }
+      footer {
+        margin-top: 12px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <main class="terminal" aria-label="Terminal window">
+        <div class="titlebar" aria-hidden="true">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="title">fnctn — bash — 80x24</span>
+        </div>
+        <div class="screen" id="screen" role="log" aria-live="polite" aria-relevant="additions text">
+          <div class="nojs">
+            <div class="line"><span class="prompt">visitor@fnctn:~$</span> cat status.txt</div>
+            <div class="line">We’re busy building <a href="https://agentec.io" rel="noopener">Agentec.io</a> — the fastest way to build, deploy, and orchestrate AI agents. From 30-second deployments to enterprise-scale automation.</div>
+            <div class="line muted">If you’d like early access or to collaborate, reach out:</div>
+            <div class="line">• Email: <a href="mailto:contact@fnctn.io">contact@fnctn.io</a></div>
+            <div class="line">• Phone: <a href="tel:+14027971797">+1 (402) 797-1797</a></div>
+          </div>
+        </div>
+      </main>
+      <footer>
+        © <span id="year"></span> FNCTN INC. All rights reserved.
+      </footer>
+    </div>
+    <script>
+      (function() {
+        const screen = document.getElementById('screen');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const lines = [
+          { t: 'visitor@fnctn:~$ echo "status"', cls: 'prompt' },
+          { t: 'We\'re busy building Agentec.io — the fastest way to build, deploy, and orchestrate AI agents. From 30-second deployments to enterprise-scale automation.' },
+          { t: 'Learn more: https://agentec.io' },
+          { t: 'Email: contact@fnctn.io' },
+          { t: 'Phone: +1 (402) 797-1797' },
+          { t: '', html: '<span class="muted">Press Ctrl+C (or Cmd+C) to copy details.</span>' }
+        ];
+
+        const linkify = (text) => {
+          if (text.startsWith('Learn more:')) {
+            return 'Learn more: <a href="https://agentec.io" rel="noopener">agentec.io</a>';
+          }
+          if (text.startsWith('Email:')) {
+            return 'Email: <a href="mailto:contact@fnctn.io">contact@fnctn.io</a>';
+          }
+          if (text.startsWith('Phone:')) {
+            return 'Phone: <a href="tel:+14027971797">+1 (402) 797-1797</a>';
+          }
+          if (text.includes('Agentec.io')) {
+            return text.replace('Agentec.io', '<a href="https://agentec.io" rel="noopener">Agentec.io</a>');
+          }
+          return text;
+        };
+
+        function appendLine(content, className) {
+          const el = document.createElement('div');
+          el.className = 'line' + (className ? ' ' + className : '');
+          el.innerHTML = content;
+          screen.appendChild(el);
+          screen.scrollTop = screen.scrollHeight;
+        }
+
+        function typeText(text, className) {
+          return new Promise((resolve) => {
+            if (prefersReducedMotion) {
+              appendLine(linkify(text), className);
+              return resolve();
+            }
+            const line = document.createElement('div');
+            line.className = 'line' + (className ? ' ' + className : '');
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            screen.appendChild(line);
+
+            let i = 0;
+            const tick = () => {
+              line.innerHTML = linkify(text.slice(0, i)) + cursor.outerHTML;
+              screen.scrollTop = screen.scrollHeight;
+              if (i++ < text.length) {
+                setTimeout(tick, 12);
+              } else {
+                line.innerHTML = linkify(text);
+                resolve();
+              }
+            };
+            tick();
+          });
+        }
+
+        function getSelectionText() {
+          if (window.getSelection) {
+            return window.getSelection().toString();
+          }
+          return '';
+        }
+
+        async function copyContactInfo() {
+          const text = [
+            'Agentec.io — the fastest way to build, deploy, and orchestrate AI agents. From 30-second deployments to enterprise-scale automation.',
+            'https://agentec.io',
+            'contact@fnctn.io',
+            '+1 (402) 797-1797',
+            'FNCTN INC.'
+          ].join('\n');
+          try {
+            if (navigator.clipboard && window.isSecureContext) {
+              await navigator.clipboard.writeText(text);
+              return true;
+            }
+          } catch (_) {}
+
+          // Fallback using a temporary textarea
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.setAttribute('readonly', '');
+            ta.style.position = 'fixed';
+            ta.style.top = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
+          } catch (_) {
+            return false;
+          }
+        }
+
+        document.addEventListener('keydown', async (event) => {
+          const isModifier = event.metaKey || event.ctrlKey;
+          const isC = event.key === 'c' || event.key === 'C';
+          if (!isModifier || !isC) return;
+
+          // If user has a selection, let the default copy happen
+          if (getSelectionText().length > 0) return;
+
+          event.preventDefault();
+          const ok = await copyContactInfo();
+          appendLine(`<span class="muted">${ok ? 'Copied site details to clipboard.' : 'Copy failed. Use the links above.'}</span>`);
+        });
+
+        async function run() {
+          for (const item of lines) {
+            if (item.html) {
+              appendLine(item.html, item.cls);
+            } else {
+              await typeText(item.t, item.cls);
+            }
+          }
+          const y = document.getElementById('year');
+          if (y) y.textContent = new Date().getFullYear();
+        }
+
+        // Clear the no-JS fallback content
+        const nojs = screen.querySelector('.nojs');
+        if (nojs) nojs.remove();
+        run();
+      })();
+    </script>
+  </body>
+</html>
+
+
